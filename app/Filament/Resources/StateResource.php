@@ -15,6 +15,8 @@ use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\StateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\StateResource\RelationManagers;
+use App\Filament\Resources\StateResource\RelationManagers\CitiesRelationManager;
+use App\Filament\Resources\StateResource\RelationManagers\EmployeeRelationManager;
 
 class StateResource extends Resource
 {
@@ -30,15 +32,18 @@ class StateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+               Forms\Components\Section::make('State Details')
+               ->schema([
+                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('country_id')
+                 Forms\Components\Select::make('country_id')
                     ->label('country')
                     ->relationship(name: 'country', titleAttribute:'name')
                     ->searchable()
                     ->preload()
                     ->required(),
+               ])
             ]);
     }
 
@@ -86,6 +91,15 @@ class StateResource extends Resource
                  ])->columns(2)
             ]);
     }
+
+    public static function getRelations(): array
+    {
+        return [
+            CitiesRelationManager::class,
+            EmployeeRelationManager::class,
+        ];
+    }
+
 
     public static function getPages(): array
     {

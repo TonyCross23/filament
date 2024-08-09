@@ -1,47 +1,34 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 use Filament\Forms;
 use App\Models\City;
 use Filament\Tables;
 use App\Models\State;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
-use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use App\Filament\Resources\EmployeeResource\Pages;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
+use Filament\Resources\RelationManagers\RelationManager;
 
-class EmployeeResource extends Resource
+class EmployeeRelationManager extends RelationManager
 {
-    protected static ?string $model = Employee::class;
+    protected static string $relationship = 'employee';
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
-
-    public static ?string $recordTitleAttribute = 'first_name';
-
-    public static function getGlobalSearchResultTitle (Model $record) : string
-     {
-        return $record->first_name;
-     }
-
-    public static function getGloballySearchableAttributes(): array 
-     {
-        return ['first_name','middle_name','last_name','country.name'];
-     }
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -118,9 +105,10 @@ class EmployeeResource extends Resource
             ])->columns(3);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('first_name')
             ->columns([
                 Tables\Columns\TextColumn::make('full_name')
                 ->label('Name')
@@ -163,63 +151,19 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('Department')
-                  ->relationship('department','name')
-                  ->searchable()
-                  ->preload()
-                  ->indicator('Department')
-                  ->label('Filter by Department'),
+                //
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Section::make('Employee Relationships')
-                ->schema([
-                  TextEntry::make('country.name'),
-                  TextEntry::make('state.name'),
-                  TextEntry::make('city.name'),
-                  TextEntry::make('department_name'),
-                ])->columns(2),
-                Section::make('Employee Name')
-                ->schema([
-                  TextEntry::make('first_name'),
-                  TextEntry::make('middle_name'),
-                  TextEntry::make('last_name'),
-                ])->columns(3),
-                Section::make('Employee Address')
-                 ->schema([
-                   TextEntry::make('address'),
-                   TextEntry::make('zip_code'),
-                 ])->columns(3),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListEmployees::route('/'),
-            'create' => Pages\CreateEmployee::route('/create'),
-            //'view' => Pages\ViewEmployee::route('/{record}'),
-            'edit' => Pages\EditEmployee::route('/{record}/edit'),
-        ];
     }
 }
