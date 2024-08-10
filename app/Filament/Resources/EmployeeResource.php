@@ -31,6 +31,8 @@ class EmployeeResource extends Resource
 
     public static ?string $recordTitleAttribute = 'first_name';
 
+    protected static ?string $navigationGroup = 'Employee Management';
+
     public static function getGlobalSearchResultTitle (Model $record) : string
      {
         return $record->first_name;
@@ -39,6 +41,23 @@ class EmployeeResource extends Resource
     public static function getGloballySearchableAttributes(): array 
      {
         return ['first_name','middle_name','last_name','country.name'];
+     }
+
+    public static function getGlobalSearchResultDetails (Model $record): array 
+     {
+        return [
+            'Country' => $record->country->name
+        ];
+     } 
+
+    public static function getGlobalSearchElquentQuery(): Builder
+     {
+        return parent::getGlobalSearchElquentQuery()->with(['country']);
+     }
+
+    public static function getNavigationBadge(): ?string
+     {
+        return static::getModel()::count();
      }
 
     public static function form(Form $form): Form
