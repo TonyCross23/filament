@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\City;
+use App\Models\Team;
 use App\Models\State;
+use App\Models\Country;
 use App\Models\Department;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +35,11 @@ class Employee extends Model
     public function department () : BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 
 }
